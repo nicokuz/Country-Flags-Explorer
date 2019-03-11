@@ -42,7 +42,7 @@ countryMaps <- geojson_read("https://github.com/simonepri/geo-maps/releases/down
 mapData <- left_join(data.frame(A3=countryMaps$A3), flags, by="A3")
 
 
-# Define server logic required to draw a histogram
+# Define server logic
 shinyServer(function(input, output) {
   
   showFlags <- reactive({
@@ -54,11 +54,11 @@ shinyServer(function(input, output) {
       mapData$area <= input$area[2]  
   })
   
-  output$title <- renderText({ 
-    paste("Country Flags Explorer - by Nico Kuzminski -", sum(showFlags()), "countries selected")
+  output$title <- reactive({ 
+    paste(title,"-",sum(showFlags()), "countries selected")
   })
   
-  output$distPlot <- renderLeaflet({
+  output$mapPlot <- renderLeaflet({
     
     leaflet(countryMaps[showFlags(),]) %>% addTiles() %>%
       addPolygons(fillColor = mapData[showFlags(), input$whichcolor],  

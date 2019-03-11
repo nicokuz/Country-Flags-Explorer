@@ -14,9 +14,11 @@ library(leaflet)
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel(textOutput("title")),
+  titlePanel(textOutput("title"), windowTitle = title),
   
-  # Sidebar with a slider input for number of bins 
+  h4(a(HTML("&rarr; Click here for some background or if you need help using this application. &larr;"), 
+       href="/about.html", target="_blank")), 
+  
   sidebarLayout(
     sidebarPanel(
       
@@ -39,7 +41,7 @@ shinyUI(fluidPage(
     
     # Show a plot of the generated distribution
     mainPanel(
-      leafletOutput("distPlot", height = "500")
+      leafletOutput("mapPlot", height = "480")
     )
   ),
   
