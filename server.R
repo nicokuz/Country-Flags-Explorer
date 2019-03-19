@@ -1,6 +1,6 @@
 #
 # This is the server logic of a Shiny web application. You can run the 
-# application by clicking 'Run App' above.
+# application by clicking 'Run App' above in RStudio.
 #
 # Find out more about building applications with Shiny here:
 # 
@@ -13,7 +13,7 @@ library(maps)
 library(dplyr)
 library(geojsonio)
 
-flags <- read.csv("https://archive.ics.uci.edu/ml/machine-learning-databases/flags/flag.data",
+flags <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/flags/flag.data",
                   col.names = c("name", "landmass", "zone", "area", "population", "language", "religion", 
                                 "bars", "stripes", "colours", "red", "green", "blue", "gold", "white", "black", 
                                 "orange", "mainhue", "circles", "crosses", "saltires", "quarters", "sunstars", 
@@ -37,7 +37,7 @@ flags <- left_join(flags, countryCodes, by="name")
 
 
 
-countryMaps <- geojson_read("https://github.com/simonepri/geo-maps/releases/download/v0.6.0/countries-land-10km.geo.json", what = "sp")
+countryMaps <- geojson_read("http://github.com/simonepri/geo-maps/releases/download/v0.6.0/countries-land-10km.geo.json", what = "sp")
 
 mapData <- left_join(data.frame(A3=countryMaps$A3), flags, by="A3")
 
