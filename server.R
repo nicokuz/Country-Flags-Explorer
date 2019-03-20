@@ -11,7 +11,7 @@ library(shiny)
 library(ISOcodes)
 library(maps)
 library(dplyr)
-library(geojsonio)
+
 
 flags <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/flags/flag.data",
                   col.names = c("name", "landmass", "zone", "area", "population", "language", "religion", 
@@ -35,9 +35,9 @@ countryCodes <- filter(countryCodes, !is.na(name)) %>% distinct(name, .keep_all 
 
 flags <- left_join(flags, countryCodes, by="name") 
 
+#countryMaps <- geojsonio::geojson_read("http://github.com/simonepri/geo-maps/releases/download/v0.6.0/countries-land-10km.geo.json", what = "sp")
 
-
-countryMaps <- geojson_read("http://github.com/simonepri/geo-maps/releases/download/v0.6.0/countries-land-10km.geo.json", what = "sp")
+countryMaps <- readRDS("countryMaps.rds")
 
 mapData <- left_join(data.frame(A3=countryMaps$A3), flags, by="A3")
 

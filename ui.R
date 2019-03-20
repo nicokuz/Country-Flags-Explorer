@@ -17,7 +17,7 @@ shinyUI(fluidPage(
   titlePanel(textOutput("title"), windowTitle = title),
   
   h4(a(HTML("&rarr; Click here for some background or if you need help using this application. &larr;"), 
-       href="/about.html", target="_blank")), 
+       href="README.html", target="_blank")), 
   
   sidebarLayout(
     sidebarPanel(
