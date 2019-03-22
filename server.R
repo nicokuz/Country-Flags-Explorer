@@ -13,11 +13,14 @@ library(maps)
 library(dplyr)
 
 
-flags <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/flags/flag.data",
-                  col.names = c("name", "landmass", "zone", "area", "population", "language", "religion", 
-                                "bars", "stripes", "colours", "red", "green", "blue", "gold", "white", "black", 
-                                "orange", "mainhue", "circles", "crosses", "saltires", "quarters", "sunstars", 
-                                "crescent", "triangle", "icon", "animate", "text", "topleft", "botright"))
+#Use pre downloaded data instead
+# flags <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/flags/flag.data",
+#                   col.names = c("name", "landmass", "zone", "area", "population", "language", "religion", 
+#                                 "bars", "stripes", "colours", "red", "green", "blue", "gold", "white", "black", 
+#                                 "orange", "mainhue", "circles", "crosses", "saltires", "quarters", "sunstars", 
+#                                 "crescent", "triangle", "icon", "animate", "text", "topleft", "botright"))
+
+flags <- readRDS("flagsData.rds")
 
 flags$name <- gsub("-", " ", flags$name)
 
@@ -35,6 +38,7 @@ countryCodes <- filter(countryCodes, !is.na(name)) %>% distinct(name, .keep_all 
 
 flags <- left_join(flags, countryCodes, by="name") 
 
+#Use pre downloaded data instead 
 #countryMaps <- geojsonio::geojson_read("http://github.com/simonepri/geo-maps/releases/download/v0.6.0/countries-land-10km.geo.json", what = "sp")
 
 countryMaps <- readRDS("countryMaps.rds")

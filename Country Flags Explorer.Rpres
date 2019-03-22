@@ -1,0 +1,128 @@
+<style>
+.small-code pre code {
+  font-size: 1em;
+}
+p {
+  font-size: 1em;
+}
+</style>
+
+Country Flags Explorer
+========================================================
+date: Thursday, March 21, 2019
+autosize: true
+
+```{r startup, echo = FALSE}
+library(ISOcodes)
+library(maps)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+
+countryMaps <- readRDS("countryMaps.rds")
+flags <- readRDS("flagsData.rds")
+
+countryCodes <- rbind(
+  data.frame(name = ISO_3166_1$Name, A3 = ISO_3166_1$Alpha_3, A2 = ISO_3166_1$Alpha_2),
+  data.frame(name = ISO_3166_1$Official_name, A3 = ISO_3166_1$Alpha_3, A2 = ISO_3166_1$Alpha_2),
+  data.frame(name = ISO_3166_1$Common_name, A3 = ISO_3166_1$Alpha_3, A2 = ISO_3166_1$Alpha_2),
+  data.frame(name = iso3166$ISOname, A3 = iso3166$a3, A2 = iso3166$a2),
+  data.frame(name = iso3166$mapname, A3 = iso3166$a3, A2 = iso3166$a2),
+  data.frame(name = iso3166$sovereignty, A3 = iso3166$a3, A2 = iso3166$a2)) 
+
+countryCodes <- filter(countryCodes, !is.na(name)) %>% distinct(name, .keep_all = T)
+
+
+flags <- left_join(flags, countryCodes, by="name") 
+
+```
+
+You can use and copy this application freely. Just don't forget to recognize the involved sources and authors, like me. 
+
+Have fun as much as I did!
+
+*[Nicolas E. Kuzminski](http://www.linkedin.com/in/nekuz/)*
+
+About
+========================================================
+autosize: true
+left: 40%
+class: small-code
+![](front.png)
+```{r, echo = FALSE}
+#print(paste0(nrow(flags), " flags available"))
+
+flags %>% mutate(totcountries=n(), totarea=sum(area), totpop=sum(population)) %>% 
+  group_by(mainhue, totcountries, totarea, totpop) %>% 
+  summarize(countries = n(), area=sum(area), pop=sum(population)) %>%
+  ungroup() %>%
+  mutate(area=round(area/totarea*100), 
+         pop=round(pop/totpop*100),
+        countries=round(countries/totcountries*100)) %>%
+  arrange(desc(countries)) %>%
+  transmute(color=mainhue,
+            countries=paste0(countries,"%"),
+            area=paste0(area,"%"),
+            pop=paste0(pop,"%")
+            ) %>% data.frame()
+
+```
+
+***
+<small>This application shows a [choropleth map](http://en.wikipedia.org/wiki/Choropleth_map) of the world countries coloured according to the colors of their flags. It was made as an [R Language](http://www.r-project.org/about.html) little project for the ["Developing Data Products Course by Johns Hopkins" on Coursera](http://www.coursera.org/learn/data-products), using [Shiny](http://shiny.rstudio.com/) web framework and [Leaflet](http://leafletjs.com/) map visualization. The base world map is provided online by [OpenStreetMap](http://openstreetmap.org/), the political land borders (polygons) are from [Geo-Maps](http://github.com/simonepri/geo-maps).  I've published this project's [source code on Github](http://github.com/nicokuz/Country-Flags-Explorer), which I've made freely available for anyone to use and modify for their own project.</small>
+
+Map
+========================================================
+autosize: true
+left: 40%
+![](map.png)
+<small>
+```{r, echo = FALSE}
+  print(paste0("Current map has ",nrow(countryMaps), " countries. ", sum(!is.na(flags$A3)), " (", round(sum(!is.na(flags$A3))/nrow(countryMaps)*100), "%) flags matched. Other ", sum(is.na(flags$A3)), " flags are old or couldn't be matched."))
+```
+</small>
+
+***
+<small>The map shows the world countries political land territories coloured by their national flags. It can be navigated  the usual way, with the mouse cursor or the arrow keys. When hovering with the mouse cursor over the colored countries, a popup will be shown with the country name, an image of its flag, the numeric value of its population in millions, and its area in thousands square kilometers. Bear in mind that the [Flags source dataset](http://archive.ics.uci.edu/ml/datasets/Flags) dates from 1986, so the data my differ with images, even some countries doesn't match with the current political map (ie, the Soviet Union) so they aren't shown at all.</small>
+
+Controls
+========================================================
+left: 40%
+### Flag Features Filter
+![](features.png)
+
+<small>Check the boxes to display flag color and data only for the countries having the corresponding shape feature on its flag:</small>
+- <small>Vertical **bars**</small>   
+- <small>Horizontal **stripes**</small> 
+
+***
+- <small>**Circles**</small> 
+- <small>Upright **crosses**</small> 
+- <small>**Saltires** (Diagonal crosses)</small>
+- <small>**Quarters** (Quartered Sections)</small>
+- <small>**Sunstars** (Sun or star symbols)</small>
+- <small>**Crescent** moon symbol</small>
+- <small>**Triangle**s</small> 
+- <small>**Icon** (Inanimate image)</small>
+- <small>**Animate** icon (e.g., an eagle, a tree, a human hand)</small>
+- <small>**Text** (e.g., a motto or slogan)</small>
+
+Controls
+========================================================
+### Country Statistics Filter
+![](features.png)
+
+<small>Use the sliders to display flag color and data only for the countries being in the selected ranges, selecting the minimum and maximum values to filter:</small>
+
+- <small>**By Area** territory in thousand square kilometers</small>   
+- <small>**By Population** inhabitants in millions</small>
+
+***
+### Flag Color Shown 
+![](color.png)
+
+<small>Use these radio buttons to select that the flag colors shown on the map corresponds to the color:</small>
+
+- <small>**Predominant in Flag** (Tie-breaks decided by taking the topmost hue, if that fails then the most central hue, and if that fails the leftmost hue)</small> 
+- <small>**In Top Left Corner** (moving right to decide tie-breaks)</small>
+- <small>**In Bottom Right Corner** (moving left to decide tie-breaks)</small>
